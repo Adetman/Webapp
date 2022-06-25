@@ -1,5 +1,6 @@
 #Import Streamlite
 
+import pandas as pd
 import streamlit as st
 
 #Import Image
@@ -25,38 +26,43 @@ arrival = {}
 user = st.sidebar.text_input('What is your name')
 
 #Movement type
-movement = st.sidebar.radio('What do you want from us today ' + '?', ('Book a seat', 'Hire a bus', 'Check my booking Satus'))
+movement = ['Book a seat', 'Hire a bus', 'Check my booking Satus']
+location = pd.read_csv("Nigeria.csv")
+location.sort_values(by='Capital')
 
-if movement == 'Book a seat':
-    trip = st.selectbox('Please select your trip',
-                        ('', 'One way', 'Round trip'))
+option = st.sidebar.radio('What do you want from us today ' + '?', movement)
+
+if option == 'Book a seat':
+    travel = ['One way', 'Round trip']
+    trip = st.selectbox('Please select your trip', travel)
     if trip == 'One way':
         date = st.date_input('Departure Date')
-        departure = st.selectbox('Your departure terminal is',
-                     ('', 'Lagos', 'Port Harcourt', 'Abuja'))
-        arrival = st.selectbox('Your arrival terminal is',
-                     ('', 'Lagos', 'Port Harcourt', 'Abuja'))
+        departure = st.selectbox('Your departure terminal is', location['Capital'])
+        arrival = st.selectbox('Your arrival terminal is', location['Capital'])
+        if departure == arrival:
+            st.error('Your departure point cannot be same with your arrival point')
         if(st.button('Submit')):
             st.success('Thank you for Choosing Top Transport Company, Dear ' + str(user.upper()))
     
     else:
         #First movement
         departure_date = st.date_input('Departure Date')
-        departure1 = st.selectbox('Your departure terminal is',
-                     ('', 'Lagos', 'Port Harcourt', 'Abuja'))
-        arrival1 = st.selectbox('Your arrival terminal is',
-                     ('', 'Lagos', 'Port Harcourt', 'Abuja'))
-        st.success('Your next departure terminal ' + str(arrival1))
+        departure1 = st.selectbox('Your departure terminal is', location['Capital'])
+        arrival1 = st.selectbox('Your arrival terminal is', location['Capital'])
+        if departure1 == arrival1:
+            st.error('Your departure point cannot be same with your arrival point')
+        else:
+            st.info('Your next departure terminal is ' + str(arrival1))
         return_date = st.date_input('Return Date')
         
         if(st.button('Submit')):
             st.success('Thank you for Choosing Top Transport Company, Dear ' + str(user.upper()))
 
-elif movement == 'Hire a bus':
+elif option == 'Hire a bus':
     date = st.date_input('Departure Date')
     st.number_input('How many days hire do you need?')
-    destination = st.text_input('Please enter your destination?')
-    st.success('You have chosen, ' + str(destination))
+    destination = st.selectbox('Please enter your destination?', location['Capital'])
+    st.info('You have chosen, ' + str(destination))
     st.text_area('Please provide further details and contacts')
     if(st.button('Submit')):
         st.success('Thank you for Choosing Top Transport Company, Dear ' + str(user.upper()))
